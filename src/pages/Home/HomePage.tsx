@@ -1,33 +1,30 @@
 import {type ChangeEvent, useEffect} from "react";
+import {useSelector} from "react-redux";
 import {
 	Button,
+	Checkbox,
+	FormControl,
+	InputLabel,
+	LinearProgress,
+	MenuItem,
+	Paper,
+	Select,
+	type SelectChangeEvent,
+	Stack,
 	Table,
 	TableBody,
 	TableCell,
 	TableContainer,
 	TableHead,
 	TableRow,
-	Paper,
-	Checkbox,
-	Typography,
-	Pagination,
-	Stack,
-	Select,
-	MenuItem,
-	FormControl,
-	InputLabel, type SelectChangeEvent, LinearProgress, Box,
 } from "@mui/material";
 import {useAppDispatch} from "@app/providers/store";
-import {
-	selectAllOnPage,
-	setLimit,
-	setPage,
-	toggleSelect,
-} from "@/entites/todos/model/todoSlice.ts";
-import {useSelector} from "react-redux";
+import {addEmptyTemporaryTodo, selectAllOnPage, setLimit, setPage} from "@/entites/todos/model/todoSlice.ts";
 import type {RootState} from "@app/providers/store/config/store.ts";
 import type {Todo} from "@/entites/todos/model/types.ts";
 import {deleteSelectedTodos, fetchTodos} from "@/entites/todos/model/todosThunks.ts";
+import {TablePagination} from "@widgets/Pagination/TablePagination.tsx";
+import {TableTodoRow} from "@widgets/TodoRow/TableTodoRow.tsx";
 
 export const HomePage = () => {
 	const dispatch = useAppDispatch();
@@ -45,10 +42,6 @@ export const HomePage = () => {
 		dispatch(fetchTodos());
 	}, [dispatch, page, limit]);
 
-	const handleSelectOne = (id: number) => {
-		dispatch(toggleSelect(id));
-	};
-
 	const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
 		dispatch(selectAllOnPage(event.target.checked));
 	};
@@ -61,13 +54,24 @@ export const HomePage = () => {
 		const newLimit = event.target.value;
 		dispatch(setLimit(newLimit));
 	};
+
 	const handleDeleteSelected = () => {
 		dispatch(deleteSelectedTodos());
 	};
 
+	const handleCreateTodo = () => {
+		dispatch(addEmptyTemporaryTodo());
+	};
+
 	return (
 		<Stack spacing={2}>
-			<Stack direction="row" spacing={2} alignItems="center">
+			<Stack direction="row" spacing={2} alignItems="center" justifyContent="flex-end">
+				<FormControl size="small">
+					<InputLabel id="select-limit-label">Rows</InputLabel>
+					<Select labelId="select-limit-label" value={limit} onChange={handleLimitChange}>
+						{[5, 10, 20, 50].map(l => <MenuItem key={l} value={l}>{l}</MenuItem>)}
+					</Select>
+				</FormControl>
 				<Button
 					variant="contained"
 					color="error"
@@ -76,17 +80,17 @@ export const HomePage = () => {
 				>
 					Delete Selected
 				</Button>
-				<Button variant="contained" color="primary">Create Todo</Button>
-				<FormControl size="small">
-					<InputLabel id="select-limit-label">Rows</InputLabel>
-					<Select labelId="select-limit-label" value={limit} onChange={handleLimitChange}>
-						{[5, 10, 20, 50].map(l => <MenuItem key={l} value={l}>{l}</MenuItem>)}
-					</Select>
-				</FormControl>
+				<Button
+					variant="contained"
+					color="primary"
+					onClick={handleCreateTodo}
+				>
+					Create Todo
+				</Button>
 			</Stack>
 
-			<TableContainer component={Paper}>
-				{loading && <LinearProgress/>}
+			<TableContainer component={Paper} sx={{position: "relative"}}>
+				{loading && <LinearProgress sx={{position: "absolute", top: 0, left: 0, right: 0, zIndex: 1}}/>}
 				<Table>
 					<TableHead>
 						<TableRow>
@@ -100,43 +104,26 @@ export const HomePage = () => {
 							<TableCell>ID</TableCell>
 							<TableCell>Title</TableCell>
 							<TableCell>Status</TableCell>
+							<TableCell sx={{textAlign: "center"}}>Edit</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
 						{todos.map((todo: Todo) => (
-							<TableRow key={todo.id} hover>
-								<TableCell padding="checkbox">
-									<Checkbox checked={selectedIds.includes(todo.id)} onChange={() => handleSelectOne(todo.id)}/>
-								</TableCell>
-								<TableCell>{todo.id}</TableCell>
-								<TableCell>{todo.title}</TableCell>
-								<TableCell>{todo.completed
-									? <Typography sx={{color: 'success.main'}}>Done</Typography>
-									: <Typography sx={{color: 'warning.main'}}>Pending</Typography>
-								}</TableCell>
-							</TableRow>
+							<TableTodoRow
+								todo={todo}
+								selectedIds={selectedIds}
+								key={todo.id}
+							/>
 						))}
 					</TableBody>
 				</Table>
 			</TableContainer>
-
-			<Box
-				sx={{
-					display: 'flex',
-					justifyContent: 'space-between',
-					flexDirection: {xs: 'column', sm: 'row'},
-					gap: 2,
-				}}
-			>
-				<Typography variant="body2"> Total items: {totalCount}</Typography>
-				<Pagination
-					count={totalPages}
-					page={page}
-					onChange={(_, value) => handlePageChange(value)}
-					showFirstButton
-					showLastButton
-				/>
-			</Box>
+			<TablePagination
+				page={page}
+				totalCount={totalCount}
+				totalPages={totalPages}
+				handlePageChange={handlePageChange}
+			/>
 		</Stack>
 	);
 };

@@ -1,11 +1,11 @@
-import {createTheme} from "@mui/material/styles";
+import {createTheme, type Theme} from "@mui/material/styles";
 import type {ThemeMode} from "@shared/types/ui.ts";
 
 const light = {
 	// Основа
 	background: {
 		default: "#ffffff",
-		paper: "#f7f7f7",
+		paper: "#F7F7F8",
 	},
 	// Основные цвета
 	primary: {
@@ -27,7 +27,7 @@ const light = {
 		disabled: "#9e9e9e",
 	},
 	// Границы и разделители
-	divider: "#e0e0e0",
+	divider: "#E5E7EB",
 	// Состояния
 	action: {
 		hover: "rgba(0,0,0,0.04)",
@@ -95,11 +95,74 @@ const dark = {
 	},
 };
 
+type ThemeType = {
+	theme: Theme;
+}
+
 export const getDesignTokens = (mode: ThemeMode) => ({
 	palette: {
 		mode,
 		...(mode === "light" ? light : dark),
 	},
+	components: {
+		MuiTableHead: {
+			styleOverrides: {
+				root: ({theme}: ThemeType) => ({
+					backgroundColor:
+						theme.palette.mode === 'light'
+							? theme.palette.grey[200]
+							: theme.palette.grey[900],
+				}),
+			},
+		},
+		MuiTableCell: {
+			styleOverrides: {
+				root: ({ theme }: ThemeType) => ({
+					whiteSpace: 'nowrap',
+					overflow: 'hidden',
+					textOverflow: 'ellipsis',
+					padding: '12px',
+
+					[theme.breakpoints.down('sm')]: {
+						padding: '4px',
+						maxWidth: 150,
+					},
+
+					[theme.breakpoints.down('md')]: {
+						padding: '8px',
+					},
+				}),
+				head: ({ theme }: ThemeType) => ({
+					fontSize: theme.typography.pxToRem(18), // ← меняем здесь
+					fontWeight: 600,
+					[theme.breakpoints.down('sm')]: {
+						fontSize: theme.typography.pxToRem(12),
+					},
+
+					[theme.breakpoints.down('md')]: {
+						fontSize: theme.typography.pxToRem(14),
+					},
+				}),
+
+			},
+		},
+		MuiTextField: {
+			styleOverrides: {
+				root: ({ theme } : ThemeType) => ({
+					// Фон textfield чуть светлее чем background.default
+					'& .MuiInputBase-root': {
+						backgroundColor:
+							theme.palette.mode === 'light'
+								? theme.palette.grey[200]   // светлый фон
+								: theme.palette.grey[700], // тёмный фон
+
+						// Дополнительно — скругление и мягкая рамка
+						borderRadius: theme.shape.borderRadius,
+					},
+				}),
+			},
+		},
+	}
 });
 
 export const createAppTheme = (mode: ThemeMode) =>
