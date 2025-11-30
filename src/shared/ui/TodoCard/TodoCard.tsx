@@ -10,6 +10,7 @@ interface TodoCardProps {
 	todo: Todo;
 }
 
+//  A todo card is used to display all the information on a todo page.
 export const TodoCard = ({todo}: TodoCardProps) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();

@@ -4,6 +4,9 @@ A simple test application built using **React**, **TypeScript**, **MUI**, and **
 The application demonstrates basic component usage, state management via Redux Toolkit, and styling with Material UI.
 
 ---
+## To view the finished version of the site after deployment, follow the link 
+[https://escag.github.io/space-scutum/](https://escag.github.io/space-scutum/)
+---
 
 ## Installation
 
@@ -47,7 +50,7 @@ or
 yarn dev
 ```
 
-The application will be available at: [http://localhost:5173](http://localhost:5173).
+The application will be available at: [http://localhost:5173/space-scutum](http://localhost:5173/space-scutum).
 
 ---
 

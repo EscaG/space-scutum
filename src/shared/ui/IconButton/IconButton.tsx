@@ -7,6 +7,7 @@ interface IconButtonProps {
 	onClick?: () => void;
 }
 
+// Customized button with icon
 export const IconButton = (props: IconButtonProps) => {
 	const {color, icon, onClick} = props;
 

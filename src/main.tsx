@@ -4,6 +4,7 @@ import {ThemeProvider} from "@app/providers/theme/ThemeProvider.tsx";
 import {StoreProvider} from "@app/providers/store/StoreProvider.tsx";
 import App from '@app/App.tsx';
 
+
 createRoot(document.getElementById('root')!).render(
 	<StoreProvider>
 		<ThemeProvider>

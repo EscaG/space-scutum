@@ -2,11 +2,14 @@ import {type ReactNode, useState} from "react";
 import {ThemeProvider as MuiThemeProvider, CssBaseline} from "@mui/material";
 import {ThemeContext} from "./ThemeContext";
 import {createAppTheme} from "./theme";
-import type {ThemeMode} from "../../../shared/types/ui.ts";
+import type {ThemeMode} from "@shared/types/ui.ts";
 
 interface Props {
 	children: ReactNode;
 }
+/**
+ * Theme provider with local storage and system preference
+ */
 
 export function ThemeProvider({children}: Props) {
 	// 1. LocalStorage
