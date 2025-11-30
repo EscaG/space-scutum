@@ -1,9 +1,9 @@
 import {Box, Checkbox, TableCell, TableRow, TextField} from "@mui/material";
 import {IconButton} from "@shared/ui/IconButton/IconButton.tsx";
-import DoneIcon from "@mui/icons-material/Done";
 import {StatusSelect} from "@widgets/StatusSelect/StatusSelect.tsx";
+import DoneIcon from "@mui/icons-material/Done";
 import CancelIcon from "@mui/icons-material/Cancel";
-import {EditButton} from "@shared/ui/EditButton/EditButton.tsx";
+import EditIcon from "@mui/icons-material/Edit";
 import type {Todo} from "@/entites/todos/model/types.ts";
 import {type ChangeEvent, memo, useState} from "react";
 import {deleteTemporaryTodo, toggleSelect} from "@/entites/todos/model/todoSlice.ts";
@@ -16,6 +16,7 @@ interface TodoRowProps {
 	selectedIds: number[];
 }
 
+// Memoizing a component to prevent unnecessary re-rendering
 export const TableTodoRow = memo((props: TodoRowProps) => {
 	const {
 		todo,
@@ -100,7 +101,11 @@ export const TableTodoRow = memo((props: TodoRowProps) => {
 						onClick={handleCancelEditing}
 						color="error.main"
 					/>
-					: <EditButton onClick={handleEditTodo}/>
+					: <IconButton
+						onClick={handleEditTodo}
+						color="text.primary"
+						icon={<EditIcon/>}
+					/>
 				}
 			</TableCell>
 		</TableRow>
