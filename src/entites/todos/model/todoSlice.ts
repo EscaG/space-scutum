@@ -1,15 +1,17 @@
-import {createSlice} from "@reduxjs/toolkit";
+import {createSlice, type PayloadAction} from "@reduxjs/toolkit";
 import type {TodosState} from "./types.ts";
 import {
 	createTodo,
 	deleteSelectedTodos,
 	deleteTodo,
+	fetchTodoById,
 	fetchTodos,
 	updateTodo,
 } from "@/entites/todos/model/todosThunks.ts";
 
 const initialState: TodosState = {
 	todos: [],
+	currentTodo: undefined,
 	page: 1,
 	limit: 10,
 	totalCount: 0,
@@ -45,9 +47,31 @@ const todosSlice = createSlice({
 				? Array.from(new Set([...state.selectedIds, ...pageIds]))
 				: state.selectedIds.filter((id) => !pageIds.includes(id));
 		},
+		// Creating a temporary empty todo
+		addEmptyTemporaryTodo: (state) => {
+			const newTodo = {
+				id: Date.now(),       // временный id, уникальный
+				title: "",
+				completed: false,
+				userId: 1,
+				isNew: true,           // чтобы понимать, что это новая строка
+			};
+			state.todos.unshift(newTodo);  // вставили в начало
+		},
+		// Deleting a temporary empty todo
+		deleteTemporaryTodo: (state, action: PayloadAction<number>) => {
+			state.todos = state.todos.filter(t => t.id !== action.payload);
+		},
 	},
 	extraReducers: (builder) => {
 		builder
+			.addCase(fetchTodoById.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(fetchTodoById.fulfilled, (state, action) => {
+				state.loading = false;
+				state.currentTodo = action.payload;
+			})
 			.addCase(fetchTodos.pending, (state) => {
 				state.loading = true;
 			})
@@ -58,7 +82,12 @@ const todosSlice = createSlice({
 				state.totalPages = action.payload.totalPages;
 			})
 			.addCase(createTodo.fulfilled, (state, action) => {
-				state.todos.unshift(action.payload);
+				const idExists = state.todos.some(todo => todo.id === action.payload.id);
+				if (idExists) {
+					state.todos.unshift({...action.payload, id: state.todos.length + 1});
+				} else {
+					state.todos.unshift(action.payload);
+				}
 				state.totalCount += 1;
 			})
 			.addCase(updateTodo.fulfilled, (state, action) => {
@@ -78,5 +107,12 @@ const todosSlice = createSlice({
 	},
 });
 
-export const { setPage, toggleSelect, selectAllOnPage, setLimit } = todosSlice.actions;
+export const {
+	setPage,
+	toggleSelect,
+	selectAllOnPage,
+	setLimit,
+	addEmptyTemporaryTodo,
+	deleteTemporaryTodo,
+} = todosSlice.actions;
 export const todosReducer = todosSlice.reducer;
