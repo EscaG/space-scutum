@@ -1,5 +1,6 @@
 {
   "name": "todo-test",
+  "homepage": "https://escag.github.io/space-scutum",
   "private": true,
   "version": "0.0.0",
   "type": "module",
